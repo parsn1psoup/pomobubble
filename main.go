@@ -11,7 +11,6 @@ import (
 )
 
 // TODO
-// start timer on enter
 // add break duration
 // make durations configurable (with restrictions)
 // add more key controls (e.g. pause timer)
@@ -20,11 +19,12 @@ import (
 // how to notify (sound)?
 // understand implications of WindowSizeMsg better
 // show that progress had started even for long pomodoros (time until first segment of progress bar appears)
+// add tests
 
 // so far, heavily based on https://github.com/charmbracelet/bubbletea/blob/master/examples/countdown/main.go
 // and https://github.com/charmbracelet/bubbletea/blob/master/examples/progress/main.go
 
-const durationMinutes = 7
+const durationMinutes = 1
 const duration = time.Minute * durationMinutes
 const interval = time.Second // refresh interval
 
@@ -52,8 +52,8 @@ func tick() tea.Cmd {
 }
 
 func (pm pomoModel) Init() tea.Cmd {
-	fmt.Printf("Timer is running! Duration is %v minutes.\n", durationMinutes)
-	return tick()
+	fmt.Printf("Press Enter to start timer. Duration is %v minutes.\n", durationMinutes)
+	return nil
 }
 
 func (pm pomoModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -63,6 +63,10 @@ func (pm pomoModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
 			return pm, tea.Quit
+		case "enter":
+			pm.timeout = time.Now().Add(duration)
+			pm.lastTick = time.Now()
+			return pm, tick()
 		default:
 			return pm, nil
 		}
@@ -115,8 +119,6 @@ func main() {
 	}
 
 	pm := pomoModel{
-		timeout:  time.Now().Add(duration),
-		lastTick: time.Now(),
 		progress: prog,
 	}
 
