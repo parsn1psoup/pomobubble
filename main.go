@@ -18,17 +18,19 @@ import (
 // track across multiple pomodoros
 // altscreen?
 // how to notify (sound)?
+// understand implications of WindowSizeMsg better
+// show that progress had started even for long pomodoros (time until first segment of progress bar appears)
 
 // so far, heavily based on https://github.com/charmbracelet/bubbletea/blob/master/examples/countdown/main.go
 // and https://github.com/charmbracelet/bubbletea/blob/master/examples/progress/main.go
 
-const durationMinutes = 1
+const durationMinutes = 7
 const duration = time.Minute * durationMinutes
 const interval = time.Second // refresh interval
 
 const (
 	fps              = 60 // why should stepSize depend on fps? is Update() called on every new frame?
-	stepSize float64 = 1.0 / (float64(fps))
+	stepSize float64 = 1.0 / (float64(fps)) / durationMinutes
 	padding          = 2
 	maxWidth         = 80
 )
@@ -74,14 +76,10 @@ func (pm pomoModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tickMsg:
 		pm.percent += stepSize
-		// this check shouldn't be necessary (we check for time)
-		// if pm.percent > 1.0 {
-		// 	pm.percent = 1.0
-		// 	return pm, tea.Quit
-		// }
 
 		t := time.Time(msg)
 		if t.After(pm.timeout) {
+			pm.View() // good for anything?
 			return pm, tea.Quit
 		}
 		pm.lastTick = t
@@ -100,7 +98,7 @@ func (pm pomoModel) View() string {
 	rem := pm.timeout.Sub(pm.lastTick).Round(time.Second)
 	pad := strings.Repeat(" ", padding)
 
-	if pm.percent >= 1.0 {
+	if pm.percent >= 0.999 {
 		return fmt.Sprintf("\n%s %s %s Complete! 🍅 \n\n", pad, pm.progress.View(pm.percent), pad)
 	}
 
