@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gen2brain/beeep"
 )
 
 // TODO
@@ -18,7 +19,6 @@ import (
 // add more key controls (e.g. pause timer)
 // track across multiple pomodoros
 // altscreen?
-// how to notify (sound)?
 // understand implications of WindowSizeMsg better
 // show that progress had started even for long pomodoros (time until first segment of progress bar appears)
 // add tests
@@ -145,6 +145,7 @@ func (pm pomoModel) View() string {
 	pad := strings.Repeat(" ", padding)
 
 	if pm.percent >= 0.999 {
+		beeep.Alert("PomoBubble", "Time for a break!", "assets/pom.png")
 		return fmt.Sprintf("\n%s %s %s Complete! 🍅 \n\n", pad, pm.progress.View(pm.percent), pad)
 	}
 
