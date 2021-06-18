@@ -18,7 +18,6 @@ import (
 // make breaks configurable
 // default value for pomoMinutes instead of placeholder
 // add more key controls (e.g. pause timer)
-// altscreen?
 // understand implications of WindowSizeMsg better
 // show that progress had started even for long pomodoros (time until first segment of progress bar appears)
 // add tests
@@ -77,9 +76,6 @@ func tick() tea.Cmd {
 }
 
 func (pm pomoModel) Init() tea.Cmd {
-	fmt.Println("\n\n🍅 POMOBUBBLE 🍅")
-	// this should be in View() but it always shows up several times there
-	fmt.Println("How long do you want your pomodoros?\nEnter a number betweeen 1 and 99 for length in minutes, then press Enter to start.")
 	return textinput.Blink
 }
 
@@ -234,7 +230,7 @@ func (pm pomoModel) View() string {
 	// wait for user to enter valid pomodoro duration
 	if !inputComplete {
 		return fmt.Sprintf(
-			"\n\n%s\n\n%s",
+			"🍅 POMOBUBBLE 🍅\nHow long do you want your pomodoros?\nEnter a number betweeen 1 and 99 for length in minutes, then press Enter to start.\n%s\n\n%s",
 			pm.textinput.View(),
 			"(esc to quit)",
 		) + "\n"
@@ -246,16 +242,16 @@ func (pm pomoModel) View() string {
 
 	if timerRunning {
 		if runningPom {
-			return fmt.Sprintf("\nCompleted pomodoros: %v\n\nCurrent pomodoro:\n\n%s %s %s %v \n\n", pm.history.poms, pad, pm.progress.View(pm.percent), pad, rem)
+			return fmt.Sprintf("🍅 POMOBUBBLE 🍅\nCompleted pomodoros: %v\n\nCurrent pomodoro:\n\n%s %s %s %v \n\n", pm.history.poms, pad, pm.progress.View(pm.percent), pad, rem)
 		} else {
-			return fmt.Sprintf("\nCompleted pomodoros: %v\n\nCurrent break:\n\n%s %s %s %v \n\n", pm.history.poms, pad, pm.progress.View(pm.percent), pad, rem)
+			return fmt.Sprintf("🍅 POMOBUBBLE 🍅\nCompleted pomodoros: %v\n\nCurrent break:\n\n%s %s %s %v \n\n", pm.history.poms, pad, pm.progress.View(pm.percent), pad, rem)
 		}
 	} else {
 		// status has already been updated
 		if runningPom {
-			return fmt.Sprintf("\n%s %s %s Complete! 🌴 \n\nPress Enter to start pomodoro.\n\n", pad, pm.progress.View(pm.percent), pad)
+			return fmt.Sprintf("🍅 POMOBUBBLE 🍅\n%s %s %s Complete! 🌴 \n\nPress Enter to start pomodoro.\n\n", pad, pm.progress.View(pm.percent), pad)
 		} else {
-			return fmt.Sprintf("\n%s %s %s Complete! 🍅 \n\nPress Enter to start break.\n\n", pad, pm.progress.View(pm.percent), pad)
+			return fmt.Sprintf("🍅 POMOBUBBLE 🍅\n%s %s %s Complete! 🍅 \n\nPress Enter to start break.\n\n", pad, pm.progress.View(pm.percent), pad)
 		}
 	}
 }
@@ -284,7 +280,7 @@ func main() {
 		history:   pomoHistory{poms: 0, shortBreaks: 0, longBreaks: 0},
 	}
 
-	if err := tea.NewProgram(pm).Start(); err != nil {
+	if err := tea.NewProgram(pm, tea.WithAltScreen()).Start(); err != nil {
 		fmt.Printf("Couldn't start program: %v\n", err)
 		os.Exit(1)
 	}
